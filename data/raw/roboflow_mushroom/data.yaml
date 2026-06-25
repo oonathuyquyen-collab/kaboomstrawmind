@@ -1,0 +1,28 @@
+# Mushroom Disease Detection Dataset - Roboflow
+# Dataset THAT da download tu Roboflow
+
+path: ../datasets/roboflow_mushroom  # dataset root dir
+train: train/images  # train images (relative to 'path')
+val: valid/images    # val images (relative to 'path')
+test: test/images    # test images (relative to 'path')
+
+# Classes
+nc: 3  # number of classes
+names:
+  0: Affected         # Nam bi benh
+  1: Healthy          # Nam khoe manh
+  2: Healthy-Affected # Nam mot phan bi benh
+
+# Dataset info
+roboflow:
+  workspace: vasanth-l-m
+  project: mushroom-disease-detection-muua7
+  version: 2
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/vasanth-l-m/mushroom-disease-detection-muua7/dataset/2
+
+# Statistics
+# Train: 117 images
+# Valid: 11 images
+# Test: 6 images
+# Total: 134 images

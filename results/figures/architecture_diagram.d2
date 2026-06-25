@@ -1,0 +1,101 @@
+direction: right
+
+StrawMind_AIoT_System: {
+  label: "StrawMind AIoT System"
+
+  Edge_Device: {
+    shape: cylinder
+    label: "Edge AI Device (e.g., RPi Zero 2W/RPi 4)"
+
+    Camera: {
+      shape: cloud
+      label: "Camera Module"
+    }
+
+    StrawMind_YOLO: {
+      shape: rectangle
+      label: "Proposed StrawMind-YOLO Model"
+      style: { fill: "#aaffaa" }
+
+      Backbone: {
+        shape: hexagon
+        label: "Backbone Network (e.g., Modified CSPDarknet)"
+      }
+
+      Attention_Module: {
+        shape: rectangle
+        label: "Attention Module (e.g., CBAM/ECA)"
+        style: { fill: "#ffffaa" }
+      }
+
+      Neck: {
+        shape: hexagon
+        label: "Lightweight Neck (e.g., Modified PAN/FPN)"
+        style: { fill: "#ffffaa" }
+      }
+
+      Head: {
+        shape: hexagon
+        label: "Lightweight Head (e.g., Modified YOLO Head)"
+        style: { fill: "#ffffaa" }
+      }
+
+      Backbone -> Attention_Module: "Integrates"
+      Attention_Module -> Neck: "Features"
+      Neck -> Head: "Features"
+      Head -> StrawMind_YOLO: "Composes"
+    }
+
+    Environmental_Sensors: {
+      shape: cloud
+      label: "Environmental Sensors (Temp, Humidity)"
+    }
+
+    Actuators: {
+      shape: cloud
+      label: "Actuators (Fans, Humidifiers)"
+    }
+
+    Camera -> StrawMind_YOLO: "Image Stream"
+    StrawMind_YOLO -> Actuators: "Disease Detection & Control Command"
+    Environmental_Sensors -> Actuators: "Control Signals"
+    StrawMind_YOLO -> Environmental_Sensors: "Input for closed-loop control"
+  }
+
+  Cloud_Platform: {
+    shape: cloud
+    label: "Cloud Platform (Optional for Data Logging/Retraining)"
+  }
+
+  Mushroom_Cultivation_Environment: {
+    shape: square
+    label: "Mushroom Cultivation Environment"
+  }
+
+  Edge_Device -> Cloud_Platform: "Data Upload (Optional)"
+  Mushroom_Cultivation_Environment -> Edge_Device: "Real-time Monitoring & Control"
+  Mushroom_Cultivation_Environment -> Camera: "Visual Data"
+  Mushroom_Cultivation_Environment -> Environmental_Sensors: "Environmental Data"
+
+  Note_Novelty_1: {
+    shape: rectangle
+    label: "Novelty 1: Lightweight, Disease-Specific Model for Edge AI"
+    style: { fill: "#add8e6" }
+  }
+
+  Note_Novelty_2: {
+    shape: rectangle
+    label: "Novelty 2: Comprehensive, Annotated Vietnamese Straw Mushroom Disease Dataset (Used for Training)"
+    style: { fill: "#add8e6" }
+  }
+
+  Note_Novelty_3: {
+    shape: rectangle
+    label: "Novelty 3: AI-driven Detection with Closed-Loop Environmental Control"
+    style: { fill: "#add8e6" }
+  }
+
+  Note_Novelty_1 -> StrawMind_YOLO: "Achieved by"
+  Note_Novelty_2 -> StrawMind_YOLO: "Trained with"
+  Note_Novelty_3 -> Edge_Device: "Implemented in"
+}

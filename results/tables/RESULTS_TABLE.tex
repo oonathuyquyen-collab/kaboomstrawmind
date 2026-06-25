@@ -1,0 +1,40 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+
+\begin{document}
+
+\section*{Experimental Results and Baseline Comparison}
+
+This section presents the comparative experimental results of various State-of-the-Art (SOTA) object detection models evaluated on the expanded straw mushroom disease dataset. All models were trained and evaluated under identical conditions to ensure a fair comparison.
+
+\begin{table*}[htbp]
+    \centering
+    \caption{Comparative Performance of SOTA Object Detection Models on Straw Mushroom Disease Dataset}
+    \label{tab:results}
+    \resizebox{\textwidth}{!}{
+    \begin{tabular}{lcccccccc}
+        \toprule
+        \multirow{2}{*}{\textbf{Model}} & \multirow{2}{*}{\textbf{Params (M)}} & \multirow{2}{*}{\textbf{FLOPs (G)}} & \multicolumn{2}{c}{\textbf{mAP (\%)}} & \multicolumn{2}{c}{\textbf{Inference (ms)}} & \multirow{2}{*}{\textbf{Model Size (MB)}} & \multirow{2}{*}{\textbf{FPS (RPi4)}}\\
+        \cmidrule(lr){4-5} \cmidrule(lr){6-7}
+        & & & \textbf{mAP50} & \textbf{mAP50-95} & \textbf{GPU} & \textbf{RPi4} & & \\
+        \midrule
+        YOLOv8n & 3.0 & 8.2 & XX.X \(\pm\) Y.Y & XX.X \(\pm\) Y.Y & A.A & B.B & C.C & D.D \\
+        YOLOv8s & 11.2 & 28.6 & XX.X \(\pm\) Y.Y & XX.X \(\pm\) Y.Y & A.A & B.B & C.C & D.D \\
+        YOLOv9t & 6.9 & 25.1 & XX.X \(\pm\) Y.Y & XX.X \(\pm\) Y.Y & A.A & B.B & C.C & D.D \\
+        YOLOv10n & 2.8 & 7.4 & XX.X \(\pm\) Y.Y & XX.X \(\pm\) Y.Y & A.A & B.B & C.C & D.D \\
+        RT-DETR-R18 & 25.0 & 49.0 & XX.X \(\pm\) Y.Y & XX.X \(\pm\) Y.Y & A.A & B.B & C.C & D.D \\
+        Faster R-CNN (ResNet50) & 41.0 & 164.0 & XX.X \(\pm\) Y.Y & XX.X \(\pm\) Y.Y & A.A & B.B & C.C & D.D \\
+        EfficientDet-Lite0 & 3.4 & 2.1 & XX.X \(\pm\) Y.Y & XX.X \(\pm\) Y.Y & A.A & B.B & C.C & D.D \\
+        \midrule
+        Proposed StrawMind-YOLO & Z.Z & W.W & XX.X \(\pm\) Y.Y & XX.X \(\pm\) Y.Y & A.A & B.B & C.C & D.D \\
+        \bottomrule
+    \end{tabular}
+    }
+\end{table*}
+
+\end{document}
