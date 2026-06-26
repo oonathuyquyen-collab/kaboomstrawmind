@@ -1,94 +1,55 @@
-# StrawMind: AIoT System for Straw Mushroom Disease Detection
+# StrawMind 🍄
+**An Attention-Augmented Real-Time Detector and a Reproducible Imbalanced Benchmark for Mushroom Fungal-Disease Detection**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![YOLOv8](https://img.shields.io/badge/YOLO-v8-green.svg)](https://github.com/ultralytics/ultralytics)
+Detecting fungal contamination (*Trichoderma* green mold, *Aspergillus*) in mushroom cultivation,
+with a transparent class-imbalance protocol and a CBAM-augmented YOLOv8 detector (**StrawMind-CBAM**).
 
-StrawMind is a novel Edge AIoT system designed for real-time detection and management of fungal diseases in straw mushroom cultivation, specifically tailored for environments like the Mekong Delta in Vietnam.
+## Key results (held-out TEST set, seed 42)
+| Model | mAP@50 | mAP@50-95 | P | R | Params |
+|---|---|---|---|---|---|
+| YOLOv8n | 0.6937 | 0.5290 | 0.724 | 0.691 | 3.0M |
+| YOLOv8s | 0.6970 | 0.5406 | 0.714 | 0.689 | 11.1M |
+| YOLOv10n | 0.6873 | 0.5402 | 0.704 | 0.683 | 2.27M |
+| **StrawMind-CBAM (ours)** | **0.6953** | 0.5385 | 0.712 | 0.684 | 3.10M |
 
-## 🌟 Key Features
+Per-class mAP@50 (StrawMind-CBAM): Healthy **0.804** · Trichoderma **0.287** · Aspergillus **0.995**.
+3-seed mean±std: see `RESULTS_3SEED.csv` (campaign in progress).
 
-- **Lightweight Disease Detection**: Optimized StrawMind-YOLO model for real-time identification of Trichoderma spp., Aspergillus spp., and Soft Rot on edge devices (Raspberry Pi).
-- **Comprehensive Dataset**: A curated and expanded dataset of straw mushroom diseases with meticulous annotations and advanced augmentations.
-- **AIoT Integration**: Closed-loop environmental control based on real-time disease detection to proactively manage cultivation microclimates.
-- **Scientific Rigor**: Developed following Q1 journal standards, including thorough audits, novelty statements, and SOTA baseline comparisons.
+> ⚠️ **Every number is read directly from Ultralytics training/validation logs. No estimated or fabricated metrics.**
 
-## 📁 Project Structure
+## Dataset (StrawMind v2)
+- Aggregated from 2 public Roboflow Universe sources (CC BY 4.0), 3 classes (Healthy / Trichoderma / Aspergillus).
+- Stratified 70/15/15 split (seed 42), **absolutely held-out test set**.
+- Imbalance mitigation: Aspergillus oversampled ×4 (train only) + copy-paste augmentation.
+- 1713 train / 276 val / 276 test images. See `DATASET_CARD.md`.
 
-```text
-strawmind_final/
-├── docs/               # Research and project documentation
-│   ├── audit/          # Initial codebase audit and original reports
-│   ├── research/       # Novelty statement, related work, and SOTA guidelines
-│   ├── dataset/        # DATASET_CARD.md and data splitting strategy
-│   ├── paper/          # LaTeX manuscript and references
-│   └── QUALITY_CHECKLIST.md
-├── src/                # Original and improved source code
-│   ├── models/         # Model architectures (including CBAM)
-│   ├── utils/          # Utility scripts for visualization and processing
-│   └── inference/      # Demo and testing scripts
-├── data/               # Dataset storage
-│   ├── raw/            # Original training data and YAML configs
-│   └── processed/      # Placeholder for augmented/standardized data
-├── results/            # Experimental outputs
-│   ├── tables/         # LaTeX results tables
-│   ├── figures/        # Architecture diagrams and training plots
-│   └── logs/           # Training logs
-├── scripts/            # SOTA training and evaluation templates
-├── assets/             # Pre-trained model weights (yolov8s_best.pt)
-└── README.md           # This file
+## StrawMind-CBAM architecture
+YOLOv8n backbone + neck, with a **CBAM module on each detection scale (P3/P4/P5)** before the Detect head.
+Warm-started from `yolov8n.pt`. Channels 64/128/256. See `configs/yolov8n-cbam.yaml`.
+
+## Reproducibility
+| Stage | Kaggle notebook |
+|---|---|
+| Dataset build | `cattillallnight/strawmind-dataprep` |
+| Baselines YOLOv8n/s | `strawmind-lo1` |
+| YOLOv10n + StrawMind-CBAM | `strawmind-lo2` / `strawmind-lo2b` |
+| 3-seed campaign | `strawmind-lo3` |
+| Ablation (CBAM × copy-paste) | `strawmind-lo4` |
+
+All trained for 100 epochs, imgsz 640, batch 16, on NVIDIA P100, PyTorch 2.5.1 + CUDA 12.1, Ultralytics.
+
+## Repo layout
+```
+paper.tex             # Q1 manuscript (LaTeX)
+references.bib        # 11 DOI-verified citations
+RELATED_WORK.md       # literature review draft
+DATASET_CARD.md       # dataset documentation
+RESULTS_TABLE_REAL.csv# verified per-model metrics
+RESULTS_3SEED.csv     # 3-seed mean±std (in progress)
+NOVELTY_STATEMENT.md  # contributions
+configs/              # model + data yaml
+notebooks/            # Kaggle training scripts
 ```
 
-## 🚀 Quick Start
-
-### 1. Installation
-
-Clone the repository and install dependencies:
-
-```bash
-git clone https://github.com/oonathuyquyen-collab/kaboomstrawmind.git
-cd kaboomstrawmind
-pip install -r src/requirements.txt
-```
-
-### 2. Inference Demo
-
-Run the demo inference script using the pre-trained weights:
-
-```bash
-python src/demo_inference.py --weights assets/yolov8s_best.pt --source data/raw/test_images
-```
-
-### 3. Training Template
-
-For establishing SOTA baselines, refer to the template script:
-
-```bash
-python scripts/training_script_template.py
-```
-
-## 📝 Research Artifacts
-
-This project includes several key artifacts aimed at Q1 publication:
-
-- **Audit Report**: Detailed analysis of the initial codebase and identified gaps.
-- **Novelty Statement**: Articulation of the project's unique scientific contributions.
-- **LaTeX Manuscript**: A professionally formatted paper draft ready for further refinement.
-- **Dataset Card**: Comprehensive metadata and splitting strategy for the expanded dataset.
-
-## 🤝 Contributing
-
-Contributions to improve the model architecture, expand the dataset, or enhance the AIoT integration are welcome. Please refer to the research documentation in `docs/` for guidance on scientific standards.
-
-## 📜 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Made with ❤️ for Vietnamese Mushroom Farmers 🍄
-- Initial codebase by [cattillallnight](https://github.com/cattillallnight/strawmind)
-- Research and refinement by Manus AI
-
----
-*For more detailed information, please explore the `docs/` directory.*
+## License
+Code: MIT. Data: per original sources (CC BY 4.0).

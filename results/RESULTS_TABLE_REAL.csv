@@ -1,0 +1,8 @@
+model_name,seed,source_file,best_epoch,mAP50,mAP50-95,Precision,Recall,note
+yolov8s,42,results/logs/yolov8s_baseline_seed42/results.csv,84,0.07312,0.02425,0.27281,0.05664,"dataset goc 134 anh qua nho"
+yolov8n,42,results/logs/yolov8n_comparison_seed42/results.csv,31,0.10258,0.02953,0.69178,0.11329,"dataset goc 134 anh qua nho"
+yolov10n,42,results/logs/yolov10n_sota_seed42/results.csv,45,0.08301,0.01236,0.48118,0.07407,"dataset goc 134 anh qua nho"
+yolov8n_v2,42,strawmind-lo1/log,best,0.6937,0.5290,0.7238,0.6907,"TEST held-out v2; Healthy=0.810 Trichoderma=0.276 Aspergillus=0.995"
+yolov8s_v2,42,strawmind-lo1/log,best,0.6970,0.5406,0.7137,0.6885,"TEST held-out v2; Healthy=0.806 Trichoderma=0.293 Aspergillus=0.992"
+yolov10n_v2,42,strawmind-lo2/run.log,best,0.6873,0.5402,0.7041,0.6828,"TEST held-out v2; 2.27M params 6.5GFLOPs; Healthy=0.797 Trichoderma=0.271 Aspergillus=0.994"
+strawmind_cbam_v2,42,strawmind-lo2b/run.log,best,0.6953,0.5385,0.7120,0.6844,"TEST held-out v2; 3.10M params 8.3GFLOPs; Healthy=0.804 Trichoderma=0.287 Aspergillus=0.995; +0.16pp mAP50 / +1.1pp Trichoderma vs yolov8n"
