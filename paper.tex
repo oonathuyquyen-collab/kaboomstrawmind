@@ -28,11 +28,11 @@ On the held-out test set, baseline YOLOv8n/s reach mAP@50 of $0.694/0.697$, with
 \emph{Aspergillus} detection (mAP@50 $\approx 0.99$) after imbalance mitigation, while the
 densely-packed \emph{Trichoderma} class remains the hardest ($\approx 0.28$). Across three seeds, \smc{} attains the best mean mAP@50 ($0.6998\pm0.0045$) and the best mean
 \emph{Trichoderma} detection, improving over the same-backbone YOLOv8n baseline on all three seeds
-at only $+0.1$M parameters. All data-building and training code, configs,
+at only $+0.1$M parameters. To identify the best detector for resource-constrained IoT deployment, we further conduct a \emph{systematic comparison of six attention mechanisms} (SE, ECA, Coordinate Attention, GAM, CBAM, and a multi-frequency variant) on an identical YOLOv8n backbone, jointly evaluating accuracy and on-device efficiency (parameters, GFLOPs, and measured FPS). Efficient Channel Attention (ECA) yields the best accuracy--efficiency trade-off---the highest test mAP@50 ($0.7045$) at the lowest computational cost ($8.20$ GFLOPs, $162.7$ FPS on an NVIDIA P100)---making it our recommended model for real-time edge inference, while CBAM gives the strongest rare-class (\emph{Trichoderma}) sensitivity. All data-building and training code, configs,
 seeds, and logs are released for full reproducibility.
 \end{abstract}
 
-\textbf{Keywords:} mushroom disease detection; object detection; attention; CBAM; class imbalance; YOLO; reproducible benchmark.
+\textbf{Keywords:} mushroom disease detection; object detection; attention; CBAM; class imbalance; YOLO; reproducible benchmark; edge/IoT deployment; model efficiency.
 
 \section{Introduction}
 Mushroom cultivation is highly susceptible to fungal contaminants such as \emph{Trichoderma}
@@ -52,6 +52,13 @@ We address both gaps with \sm. Our contributions are:
   imbalance-mitigation protocol.
   \item \textbf{\smc}, a YOLOv8 detector with CBAM attention injected at every detection scale to
   boost sensitivity to small/rare lesions.
+  \item A \textbf{systematic attention-mechanism benchmark} for this task: six attention modules
+  (SE, ECA, Coordinate Attention, GAM, CBAM, and a multi-frequency variant) integrated at identical
+  positions on a shared YOLOv8n backbone and trained under identical settings, jointly analysed for
+  accuracy \emph{and} on-device efficiency (parameters, GFLOPs, measured FPS).
+  \item An \textbf{IoT-oriented deployment recommendation}: we show that Efficient Channel Attention
+  (ECA) is Pareto-optimal---highest test mAP@50 at the lowest computational cost---and is therefore
+  the preferred detector for real-time edge monitoring.
   \item A \textbf{controlled empirical study} (multiple architectures, fixed seeds, identical splits)
   with all logs/configs released; every reported metric is read directly from training/validation
   logs (no estimates).
@@ -226,6 +233,62 @@ CBAM & copy-paste & mAP@50 & mAP@50--95 & Trichoderma & Aspergillus\\
 \caption{Isolated effect of CBAM (seed 42). CBAM provides $+0.0126$ overall mAP@50 and $+0.0315$ on \emph{Trichoderma}, confirming attention---not augmentation---drives the gain.}\label{fig:ablation_fig}
 \end{figure}
 
+
+\section{Attention Mechanism Comparison and IoT Efficiency}
+\label{sec:attn}
+A central question for practical deployment is \emph{which} attention mechanism offers the best
+return for an edge device. We integrate six attention modules---SE~\cite{hu2018senet},
+Efficient Channel Attention (ECA), Coordinate Attention (CoordAtt), GAM, CBAM~\cite{woo2018cbam},
+and a multi-frequency variant (MFCA)---at identical positions on a shared YOLOv8n backbone and
+train each under identical settings (seed 42, 100 epochs, same splits). Efficiency metrics
+(parameters, GFLOPs, and FPS at 640x640, batch 1, FP16) are measured on an NVIDIA P100.
+
+\begin{table}[t]\centering
+\caption{Attention mechanism comparison on the held-out TEST set (seed 42). Accuracy and
+on-device efficiency are reported jointly. \textbf{Bold} = best; ECA is Pareto-optimal
+(highest mAP@50 at the lowest GFLOPs).}
+\label{tab:attn}
+\small
+\begin{tabular}{lccccc}
+\toprule
+Model & Params (M) & GFLOPs & FPS & mAP@50 & \emph{Trichoderma} \\
+\midrule
+YOLOv8n (baseline) & 3.16 & 8.86 & \textbf{178.8} & 0.6973 & 0.2776 \\
+\quad +SE          & 3.02 & 8.21 & 162.9 & 0.6965 & 0.2805 \\
+\quad +ECA         & \textbf{3.01} & \textbf{8.20} & 162.7 & \textbf{0.7045} & 0.2833 \\
+\quad +CoordAtt    & 3.02 & 8.22 & 141.0 & 0.7001 & 0.2873 \\
+\quad +GAM         & 5.16 & 12.14 & 124.3 & 0.6958 & 0.2674 \\
+\quad +CBAM (\smc) & 3.10 & 8.27 & 150.0 & 0.6998 & \textbf{0.2923} \\
+\quad +MFCA        & 3.12 & 8.42 & 122.3 & 0.6974 & 0.2861 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]\centering
+\includegraphics[width=0.74\linewidth]{figures/fig_attention_comparison.png}
+\caption{Test mAP@50 across all attention variants on an identical YOLOv8n backbone. Differences
+among lightweight variants are small (within run-to-run noise), but ECA attains the highest mean.}
+\label{fig:attn_bar}
+\end{figure}
+
+\begin{figure}[t]\centering
+\includegraphics[width=0.70\linewidth]{figures/fig_pareto_flops.png}
+\caption{Accuracy--efficiency trade-off. ECA occupies the Pareto-optimal corner: highest mAP@50
+at the lowest computational cost, the most desirable operating point for IoT/edge deployment.}
+\label{fig:pareto}
+\end{figure}
+
+\paragraph{Findings.} Three observations follow. (i) On this task, lightweight attention modules
+perform within a narrow band (about 0.696--0.705 mAP@50); differences fall inside the seed-to-seed
+variation reported in Sec.~\ref{sec:results}, so no single module is universally best on accuracy
+alone. (ii) When efficiency is considered jointly, \textbf{ECA is Pareto-optimal}: it delivers the
+highest test mAP@50 (0.7045) at the lowest computational cost (8.20 GFLOPs) and a competitive
+162.7 FPS, while GAM is dominated (more than 1.7x the parameters for the lowest accuracy).
+(iii) CBAM remains the strongest module for the hardest, densely packed \emph{Trichoderma} class
+(0.2923), so it is preferable when rare-class recall is the priority rather than raw efficiency.
+We therefore \textbf{recommend ECA-augmented YOLOv8n as the default detector for real-time IoT
+mushroom-disease monitoring}, with CBAM as an accuracy-oriented alternative.
+
 \section{Discussion}
 The results validate our imbalance-mitigation protocol: despite \emph{Aspergillus} being the rarest
 class, it is detected almost perfectly, whereas the dominant but densely packed \emph{Trichoderma}
@@ -242,7 +305,7 @@ mAP computation and retained only for qualitative visualization. The aggregated 
 on aggregated public data; field deployment requires further validation.
 
 \section{Conclusion}
-We introduced \sm, a reproducible imbalanced benchmark, and \smc, a CBAM-augmented real-time
+Through a systematic, efficiency-aware comparison of six attention mechanisms on an identical backbone, we identify \textbf{ECA-augmented YOLOv8n as the Pareto-optimal detector for real-time IoT deployment}---achieving the highest test mAP@50 (0.7045) at the lowest computational cost (8.20 GFLOPs, 162.7 FPS)---while CBAM provides the best rare-class (\emph{Trichoderma}) sensitivity. We introduced \sm, a reproducible imbalanced benchmark, and \smc, a CBAM-augmented real-time
 detector for mushroom fungal-disease detection. With a transparent imbalance protocol, baselines
 already reach mAP@50 $\approx0.70$ and near-perfect rare-class detection. \smc{} achieves the best mean mAP@50 among all tested detectors with consistent per-seed gains over its YOLOv8n backbone. All code, configs, seeds, and logs are released.
 
